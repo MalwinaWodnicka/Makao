@@ -6,6 +6,9 @@ public class GameManager : MonoBehaviour
 {
     public Deck deck;
     public List<Player> players;
+    [SerializeField] private CardView cardPrefab;
+    [SerializeField] private CardImages cardImages;
+    [SerializeField] private Transform[] handPanel;
 
     void Start()
     {
@@ -45,5 +48,13 @@ public class GameManager : MonoBehaviour
                 Debug.Log(card.ToString());
             }
         }
+    for (int i = 0; i < players.Count; i++)
+    {
+        foreach (Card card in players[i].Hand)
+        {
+            CardView view = Instantiate(cardPrefab, handPanel[i]);
+            view.Setup(card, cardImages);
+        }
     }
+}
 }
