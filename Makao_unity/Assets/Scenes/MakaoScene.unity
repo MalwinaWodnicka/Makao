@@ -138,6 +138,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3816714387415673677, guid: d640b2d663b60af4688d0055e36ef5cb, type: 3}
   m_PrefabInstance: {fileID: 3109220839553569178}
   m_PrefabAsset: {fileID: 0}
+--- !u!224 &483264408 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5134912635620665596, guid: d640b2d663b60af4688d0055e36ef5cb, type: 3}
+  m_PrefabInstance: {fileID: 3109220839553569178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,6 +275,10 @@ MonoBehaviour:
   - {fileID: 1654242706}
   - {fileID: 875975446}
   - {fileID: 211444862}
+  discardPilePanel: {fileID: 483264408}
+  currentPlayerIndex: 0
+  playDirection: 1
+  numberCardsToDraw: 0
 --- !u!4 &985546530
 Transform:
   m_ObjectHideFlags: 0
@@ -366,6 +375,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3512306145543842679, guid: d640b2d663b60af4688d0055e36ef5cb, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4091469354382876400, guid: d640b2d663b60af4688d0055e36ef5cb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.041
@@ -410,7 +423,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: Table
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8872618159701577648, guid: d640b2d663b60af4688d0055e36ef5cb, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 985546529}
+    m_RemovedComponents:
+    - {fileID: 3512306145543842679, guid: d640b2d663b60af4688d0055e36ef5cb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

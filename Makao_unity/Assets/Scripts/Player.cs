@@ -19,4 +19,12 @@ public class Player
             Hand.Add(card);
         }
     }
+
+    public void RemoveCard(Card card)
+    {
+        if (Hand.Contains(card))
+        {
+            Hand.Remove(card);
+        }
+    }
 }
