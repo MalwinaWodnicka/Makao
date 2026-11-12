@@ -17,7 +17,9 @@ public class GameManager : MonoBehaviour
     public int playDirection = 1;
     public Card topCard;
     public int numberCardsToDraw = 0;
-
+    private int turnToSkip = 0;
+    public CardRank? requestedRank = null;
+    public CardSuit? requestedSuit = null;
 
     void Start()
     {
@@ -53,7 +55,19 @@ public class GameManager : MonoBehaviour
     public void NextPlayer()
     {
         currentPlayerIndex += playDirection;
+        WrapPlayerIndex();
 
+        while (turnToSkip > 0 && numberCardsToDraw == 0)
+        {
+            turnToSkip--;
+            currentPlayerIndex += playDirection;
+            WrapPlayerIndex();
+        }
+        Debug.Log($"Tura gracza: {players[currentPlayerIndex].Name}");
+    }
+
+    private void WrapPlayerIndex()
+    {
         if (currentPlayerIndex >= players.Count)
         {
             currentPlayerIndex = 0;
@@ -62,15 +76,62 @@ public class GameManager : MonoBehaviour
         {
             currentPlayerIndex = players.Count - 1;
         }
-        Debug.Log($"Tura gracza: {players[currentPlayerIndex].Name}");
     }
 
     public bool IsMoveLegal(Card cardToPlay)
     {
-        if (cardToPlay.Suit == topCard.Suit || cardToPlay.Rank == topCard.Rank)
+        // Dobieranie
+        if (numberCardsToDraw > 0)
+        {
+            if (cardToPlay.Rank == topCard.Rank)
+            {
+                return true;
+            }
+
+            if (cardToPlay.Suit == topCard.Suit)
+            {
+                if (cardToPlay.Rank == CardRank.Two || cardToPlay.Rank == CardRank.Three)
+                {
+                    return true;
+                }
+                if (cardToPlay.Rank == CardRank.King && (cardToPlay.Suit == CardSuit.Hearts || cardToPlay.Suit == CardSuit.Spades))
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        // Pominiêcie tury
+        if (turnToSkip > 0)
+        {
+            return cardToPlay.Rank == CardRank.Four;
+        }
+
+        // ¯¹danie Jack'a
+        if (requestedRank.HasValue)
+        {
+            return cardToPlay.Rank == requestedRank.Value || cardToPlay.Rank == CardRank.Jack || cardToPlay.Rank == CardRank.Queen;
+        }
+
+        // ¯¹danie Ace
+        if (requestedSuit.HasValue)
+        {
+            return cardToPlay.Suit == requestedSuit.Value || cardToPlay.Rank == CardRank.Ace || cardToPlay.Rank == CardRank.Queen;
+        }
+
+        // Queen
+        if (cardToPlay.Rank == CardRank.Queen || topCard.Rank == CardRank.Queen)
         {
             return true;
         }
+
+        // Podstawowe zasady
+        if (cardToPlay.Suit == topCard.Suit || cardToPlay.Rank == topCard.Rank)
+        {
+            return true;
+        } 
 
         return false;
     }
@@ -89,6 +150,16 @@ public class GameManager : MonoBehaviour
             player.RemoveCard(card);
             topCard = card;
             Debug.Log($"{player.Name} zagra³ {card}");
+
+            if (card.Rank != CardRank.Jack)
+            {
+                requestedRank = null;
+            }
+           
+            if (card.Rank != CardRank.Ace)
+            {
+                requestedSuit = null;
+            }
 
             ApplySpecialCardEffect(card);
             NextPlayer();
@@ -120,6 +191,8 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"{player.Name} dobra³ {drawCount} kart");
         numberCardsToDraw = 0;
+        requestedSuit = null;
+        requestedRank = null;
 
         NextPlayer();
         UpdateUI();
@@ -133,25 +206,31 @@ public class GameManager : MonoBehaviour
                 numberCardsToDraw += 2;
                 break;
             case CardRank.Three:
+                numberCardsToDraw += 3;
                 break;
             case CardRank.Four:
+                turnToSkip += 1;
                 break;
             case CardRank.Jack:
-                break;
-            case CardRank.Queen:
+                CardRank[] possibleRanks = { CardRank.Five, CardRank.Six, CardRank.Seven, CardRank.Eight, CardRank.Nine, CardRank.Ten, };
+                requestedRank = possibleRanks[Random.Range(0, possibleRanks.Length)];
+                Debug.Log($"Zosta³ zagrany Jack. ¯¹dana karta: {requestedRank.Value}");
                 break;
             case CardRank.King:
                 if (card.Suit == CardSuit.Hearts)
                 {
-                    break;
+                    numberCardsToDraw += 5;
                 }
-                if (card.Suit == CardSuit.Spades)
+                else if (card.Suit == CardSuit.Spades)
                 {
-                    break;
+                    numberCardsToDraw += 5;
+                    playDirection *= -1;
                 }
                 break;
 
             case CardRank.Ace:
+                requestedSuit = (CardSuit)Random.Range(0, 4);
+                topCard = new Card(requestedSuit.Value, CardRank.Ace);
                 break;
         }
     }
